@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-header">
+  <div>
+    <h2>Products</h2>
+    <p>Track SKUs and current stock.</p>
+  </div>
+  {% if current_user.role.value == "admin" %}
+  <a href="/products/new" class="button">Add Product</a>
+  {% endif %}
+</section>
+
+<section class="panel">
+  <table>
+    <thead>
+      <tr>
+        <th>SKU</th>
+        <th>Name</th>
+        <th>Unit</th>
+        <th>Stock</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for product in products %}
+      <tr>
+        <td><a href="/products/{{ product.id }}">{{ product.sku }}</a></td>
+        <td>{{ product.name }}</td>
+        <td>{{ product.unit }}</td>
+        <td>{{ product.stock_quantity }}</td>
+        <td>{{ "Active" if product.is_active else "Inactive" }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="5">No products yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

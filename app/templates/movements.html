@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-header">
+  <div>
+    <h2>Inventory Movements</h2>
+    <p>All stock changes across products.</p>
+  </div>
+  <a href="/movements/new" class="button">New Movement</a>
+</section>
+
+<section class="panel">
+  <table>
+    <thead>
+      <tr>
+        <th>Time</th>
+        <th>Product</th>
+        <th>Type</th>
+        <th>Qty</th>
+        <th>Delta</th>
+        <th>User</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for movement in movements %}
+      <tr>
+        <td>{{ movement.created_at.strftime("%Y-%m-%d %H:%M") }}</td>
+        <td>{{ movement.product.name }}</td>
+        <td>{{ movement.movement_type.value }}</td>
+        <td>{{ movement.quantity }}</td>
+        <td>{{ movement.delta }}</td>
+        <td>{{ movement.user.username }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6">No movements yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-header">
+  <div>
+    <h2>New Product</h2>
+    <p>Create a stock-managed product record.</p>
+  </div>
+</section>
+
+<section class="panel form-panel">
+  {% if error %}
+  <div class="alert">{{ error }}</div>
+  {% endif %}
+  <form method="post" class="stack">
+    <label>SKU
+      <input type="text" name="sku" value="{{ form.get('sku', '') }}" required>
+    </label>
+    <label>Name
+      <input type="text" name="name" value="{{ form.get('name', '') }}" required>
+    </label>
+    <label>Description
+      <textarea name="description">{{ form.get('description', '') }}</textarea>
+    </label>
+    <label>Unit
+      <input type="text" name="unit" value="{{ form.get('unit', 'pcs') }}" required>
+    </label>
+    <label class="checkbox">
+      <input type="checkbox" name="is_active" {% if form.get('is_active', True) %}checked{% endif %}>
+      Active
+    </label>
+    <button type="submit" class="button">Create Product</button>
+  </form>
+</section>
+{% endblock %}

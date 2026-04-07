@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="page-header">
+  <div>
+    <h2>Dashboard</h2>
+    <p>Inventory overview for the current tenant.</p>
+  </div>
+</section>
+
+<section class="stats-grid">
+  <article class="stat-card"><span>Total Products</span><strong>{{ product_count }}</strong></article>
+  <article class="stat-card"><span>Active Products</span><strong>{{ active_product_count }}</strong></article>
+  <article class="stat-card"><span>Total Stock</span><strong>{{ total_stock }}</strong></article>
+  <article class="stat-card"><span>Total Movements</span><strong>{{ movement_count }}</strong></article>
+</section>
+
+<section class="panel">
+  <div class="section-title">
+    <h3>Recent Movements</h3>
+    <a href="/movements/new" class="button">New Movement</a>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>Time</th>
+        <th>Product ID</th>
+        <th>Type</th>
+        <th>Qty</th>
+        <th>Delta</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for movement in recent_movements %}
+      <tr>
+        <td>{{ movement.created_at.strftime("%Y-%m-%d %H:%M") }}</td>
+        <td>{{ movement.product_id }}</td>
+        <td>{{ movement.movement_type.value }}</td>
+        <td>{{ movement.quantity }}</td>
+        <td>{{ movement.delta }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="5">No movements yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

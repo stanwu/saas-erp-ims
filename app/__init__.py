@@ -1,0 +1,1 @@
+"""ERP IMS application package."""

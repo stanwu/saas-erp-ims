@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ title or "ERP IMS" }}</title>
+    <link rel="stylesheet" href="/static/styles.css">
+  </head>
+  <body>
+    <div class="layout">
+      {% if current_user %}
+      <aside class="sidebar">
+        <div class="brand">
+          <h1>ERP IMS</h1>
+          <p>{{ current_user.username }} / {{ current_user.role.value }}</p>
+        </div>
+        <nav>
+          <a href="/dashboard">Dashboard</a>
+          <a href="/products">Products</a>
+          <a href="/movements">Movements</a>
+          {% if current_user.role.value == "admin" %}
+          <a href="/users">Users</a>
+          {% endif %}
+        </nav>
+        <form action="/logout" method="post">
+          <button type="submit" class="button secondary">Logout</button>
+        </form>
+      </aside>
+      {% endif %}
+      <main class="content {% if not current_user %}content-auth{% endif %}">
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+  </body>
+</html>
