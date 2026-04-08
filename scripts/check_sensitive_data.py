@@ -35,7 +35,7 @@ ALLOWLIST_TERMS = {
     "dev-secret-key",
     "dev-secret-key-change-in-prod",
     "csrf-secret-change-in-prod",
-    "admin12345",
+    "admin@12345",
     "demo12345",
     "changeme",
     "your-secret",

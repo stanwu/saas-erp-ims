@@ -11,7 +11,7 @@ services:
       ERP_IMS_CSRF_SECRET: change-me-in-production
       ERP_IMS_DATABASE_URL: sqlite:////data/erp_ims.db
       ERP_IMS_ADMIN_USERNAME: admin
-      ERP_IMS_ADMIN_PASSWORD: admin12345
+      ERP_IMS_ADMIN_PASSWORD: admin@12345
     volumes:
       - erp_ims_data:/data
     restart: unless-stopped

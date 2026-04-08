@@ -10,7 +10,7 @@ os.environ["ERP_IMS_DATABASE_URL"] = f"sqlite:///{TEST_DB}"
 os.environ["ERP_IMS_SECRET_KEY"] = "test-secret"
 os.environ["ERP_IMS_CSRF_SECRET"] = "test-csrf-secret"
 os.environ["ERP_IMS_ADMIN_USERNAME"] = "admin"
-os.environ["ERP_IMS_ADMIN_PASSWORD"] = "admin12345"
+os.environ["ERP_IMS_ADMIN_PASSWORD"] = "admin@12345"
 os.environ["ERP_IMS_ENV"] = "test"
 
 from app.main import app  # noqa: E402
@@ -28,7 +28,7 @@ def _login_admin(client: TestClient) -> None:
     csrf = _get_csrf(client)
     resp = client.post(
         "/login",
-        data={"username": "admin", "password": "admin12345", "csrf_token": csrf},
+        data={"username": "admin", "password": "admin@12345", "csrf_token": csrf},
         follow_redirects=False,
     )
     assert resp.status_code == 303
@@ -46,7 +46,7 @@ def test_login_rotates_session_and_sets_samesite_cookie():
         csrf = _get_csrf(client)
         resp = client.post(
             "/login",
-            data={"username": "admin", "password": "admin12345", "csrf_token": csrf},
+            data={"username": "admin", "password": "admin@12345", "csrf_token": csrf},
             follow_redirects=False,
         )
         assert resp.status_code == 303

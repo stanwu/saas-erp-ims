@@ -138,7 +138,7 @@ SQLite data is stored in the Docker volume `erp_ims_data`.
 
 | Username | Password | Role |
 |------|------|------|
-| `admin` | `admin12345` | Admin |
+| `admin` | `admin@12345` | Admin |
 
 > **Important:** Change the default password immediately in "User Management" after your first login.
 
@@ -150,7 +150,7 @@ SQLite data is stored in the Docker volume `erp_ims_data`.
 | `ERP_IMS_DATABASE_URL` | `sqlite:///erp_ims.db` | Database connection string |
 | `ERP_IMS_ADMIN_USERNAME` | `admin` | Initial admin username |
 | `ERP_IMS_ADMIN_EMAIL` | `admin@example.com` | Initial admin email |
-| `ERP_IMS_ADMIN_PASSWORD` | `admin12345` | Initial admin password |
+| `ERP_IMS_ADMIN_PASSWORD` | `admin@12345` | Initial admin password |
 
 ---
 

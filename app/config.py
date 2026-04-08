@@ -24,7 +24,7 @@ class Settings:
             f"sqlite:///{BASE_DIR / 'erp_ims.db'}",
         )
         self.admin_username = os.getenv("ERP_IMS_ADMIN_USERNAME", "admin")
-        self.admin_password = os.getenv("ERP_IMS_ADMIN_PASSWORD", "admin12345")
+        self.admin_password = os.getenv("ERP_IMS_ADMIN_PASSWORD", "admin@12345")
         self.seed_demo_data = os.getenv("ERP_IMS_SEED_DEMO_DATA", "true").strip().lower() == "true"
         self.page_size: int = 20
         self.validate_security()
