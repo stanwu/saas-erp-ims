@@ -1,6 +1,7 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.demo_seed import seed_demo_data, should_seed_demo_data
 from app.config import get_settings
 from app.database import Base, engine
 from app.models import Category, User, UserRole, Warehouse
@@ -30,3 +31,6 @@ def seed_initial_data(db: Session) -> None:
         db.add(Category(name="General", description="General category"))
 
     db.commit()
+
+    if should_seed_demo_data(db):
+        seed_demo_data(db)
