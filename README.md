@@ -1,6 +1,6 @@
-# ERP IMS — 庫存管理系統 SaaS
+# ERP IMS - Inventory Management System SaaS
 
-基於 **FastAPI + SQLite3** 的輕量級進銷存管理系統，支援多用戶帳號（管理員 / 一般員工），適合中小型企業自架部署。
+A lightweight inventory and purchasing management system built with **FastAPI + SQLite3**. It supports multi-user accounts (admin / staff) and is suitable for self-hosted deployment in small to medium-sized businesses.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.12%2B-blue)](https://www.python.org/)
@@ -8,191 +8,197 @@
 
 ---
 
-## 功能特色
+## Features
 
-| 模組 | 功能 |
+| Module | Features |
 |------|------|
-| 商品管理 | 商品 CRUD、SKU、單位、再訂購點警示 |
-| 庫存管理 | 多倉庫庫存水位、原子性異動紀錄 |
-| 採購單 | 建立採購單 → 提交 → 部分/全額收貨，自動更新庫存 |
-| 供應商 | 供應商資料維護 |
-| 異動紀錄 | 完整稽核日誌（入庫/出庫/盤點調整/倉庫轉移） |
-| 儀表板 | 低庫存警示、開放採購單、近期異動 |
-| 用戶管理 | 多用戶帳號，admin / staff 兩種角色 |
+| Product Management | Product CRUD, SKU, unit, reorder point alerts |
+| Inventory Management | Multi-warehouse stock levels, atomic movement records |
+| Purchase Orders | Create purchase orders -> submit -> partially/fully receive, with automatic stock updates |
+| Suppliers | Supplier data management |
+| Movement Records | Complete audit logs (inbound / outbound / stock adjustment / warehouse transfer) |
+| Dashboard | Low-stock alerts, open purchase orders, recent movements |
+| User Management | Multi-user accounts with admin / staff roles |
 
 ---
 
-## 系統截圖
+## Screenshots
 
-### 登入
+### Login
 
-![登入頁面](docs/screenshots/01_login.png)
+![Login Page](docs/screenshots/01_login.png)
 
-### 儀表板
+### Dashboard
 
-總覽低庫存警示、開放採購單數量、近期異動紀錄。
+Overview of low-stock alerts, open purchase orders, and recent inventory movements.
 
-![儀表板](docs/screenshots/02_dashboard.png)
+![Dashboard](docs/screenshots/02_dashboard.png)
 
-### 商品管理
+### Product Management
 
-支援搜尋、分頁，可查看各倉庫庫存水位。
+Supports search and pagination, with visibility into stock levels across warehouses.
 
-![商品列表](docs/screenshots/03_products_list.png)
+![Product List](docs/screenshots/03_products_list.png)
 
-### 新增商品
+### Create Product
 
-設定 SKU、單位、成本、再訂購點。
+Configure the SKU, unit, cost, and reorder point.
 
-![新增商品](docs/screenshots/04_product_new.png)
+![Create Product](docs/screenshots/04_product_new.png)
 
-### 庫存異動紀錄
+### Product Detail
 
-完整稽核日誌，支援分頁與篩選。
+Displays product metadata, per-warehouse stock levels, and recent inventory activity for a single SKU.
 
-![庫存異動](docs/screenshots/05_movements_list.png)
+![Product Detail](docs/screenshots/04b_product_detail.png)
 
-### 新增庫存異動
+### Inventory Movement Records
 
-支援入庫、出庫、盤點調增/調減、倉庫轉移。
+Complete audit logs with pagination and filtering support.
 
-![新增異動](docs/screenshots/06_movement_new.png)
+![Inventory Movements](docs/screenshots/05_movements_list.png)
 
-### 供應商管理
+### Create Inventory Movement
 
-![供應商列表](docs/screenshots/07_suppliers_list.png)
+Supports inbound, outbound, stock count increases/decreases, and warehouse transfers.
 
-### 新增供應商
+![Create Movement](docs/screenshots/06_movement_new.png)
 
-![新增供應商](docs/screenshots/08_supplier_new.png)
+### Supplier Management
 
-### 倉庫管理
+![Supplier List](docs/screenshots/07_suppliers_list.png)
 
-支援多倉庫，每個商品在各倉庫各自追蹤庫存。
+### Create Supplier
 
-![倉庫管理](docs/screenshots/09_warehouses_list.png)
+![Create Supplier](docs/screenshots/08_supplier_new.png)
 
-### 採購單
+### Warehouse Management
 
-狀態流程：草稿 → 已提交 → 部分收貨 → 完成收貨。
+Supports multiple warehouses, with each product tracked independently in each warehouse.
 
-![採購單列表](docs/screenshots/10_po_list.png)
+![Warehouse Management](docs/screenshots/09_warehouses_list.png)
 
-### 新增採購單
+### Purchase Orders
 
-選擇供應商、倉庫，逐行新增商品品項。
+Status flow: Draft -> Submitted -> Partially Received -> Fully Received.
 
-![新增採購單](docs/screenshots/11_po_new.png)
+![Purchase Order List](docs/screenshots/10_po_list.png)
 
-### 用戶管理
+### Create Purchase Order
 
-管理員可新增/編輯/停用用戶，指定角色。
+Select the supplier and warehouse, then add products line by line.
 
-![用戶管理](docs/screenshots/12_users_list.png)
+![Create Purchase Order](docs/screenshots/11_po_new.png)
+
+### User Management
+
+Admins can create, edit, deactivate users, and assign roles.
+
+![User Management](docs/screenshots/12_users_list.png)
 
 ---
 
-## 快速開始
+## Quick Start
 
-### 環境需求
+### Requirements
 
 - Python 3.12+
 
-### 安裝
+### Installation
 
 ```bash
 git clone https://github.com/stanwu/saas-erp-ims.git
 cd saas-erp-ims
 
-# 建立虛擬環境
+# Create a virtual environment
 python3 -m venv .venv
 source .venv/bin/activate      # Windows: .venv\Scripts\activate
 
-# 安裝依賴
+# Install dependencies
 pip install -r requirements.txt
 
-# 啟動伺服器
+# Start the server
 uvicorn app.main:app --reload
 ```
 
-開啟瀏覽器前往 **http://localhost:8000/login**
+Open your browser and go to **http://localhost:8000/login**
 
-### 預設帳號
+### Default Account
 
-| 帳號 | 密碼 | 角色 |
+| Username | Password | Role |
 |------|------|------|
-| `admin` | `admin12345` | 管理員 |
+| `admin` | `admin12345` | Admin |
 
-> **重要：** 首次登入後請立即至「用戶管理」修改預設密碼。
+> **Important:** Change the default password immediately in "User Management" after your first login.
 
-### 環境變數
+### Environment Variables
 
-| 變數 | 預設值 | 說明 |
+| Variable | Default | Description |
 |------|--------|------|
-| `ERP_IMS_SECRET_KEY` | `dev-secret-key` | Session 加密金鑰（生產環境必須更換） |
-| `ERP_IMS_DATABASE_URL` | `sqlite:///erp_ims.db` | 資料庫連線字串 |
-| `ERP_IMS_ADMIN_USERNAME` | `admin` | 初始管理員帳號 |
-| `ERP_IMS_ADMIN_EMAIL` | `admin@example.com` | 初始管理員 Email |
-| `ERP_IMS_ADMIN_PASSWORD` | `admin12345` | 初始管理員密碼 |
+| `ERP_IMS_SECRET_KEY` | `dev-secret-key` | Session encryption key (must be changed in production) |
+| `ERP_IMS_DATABASE_URL` | `sqlite:///erp_ims.db` | Database connection string |
+| `ERP_IMS_ADMIN_USERNAME` | `admin` | Initial admin username |
+| `ERP_IMS_ADMIN_EMAIL` | `admin@example.com` | Initial admin email |
+| `ERP_IMS_ADMIN_PASSWORD` | `admin12345` | Initial admin password |
 
 ---
 
-## 操作流程
+## Workflow
 
-### 初始設定
+### Initial Setup
 
-1. **建立倉庫**：前往「倉庫管理」→「新增倉庫」
-2. **建立商品**：前往「商品管理」→「新增商品」，填入 SKU、名稱、單位、成本、再訂購點
-3. **建立供應商**：前往「供應商」→「新增供應商」
+1. **Create a warehouse**: Go to "Warehouse Management" -> "Add Warehouse"
+2. **Create products**: Go to "Product Management" -> "Add Product", then enter the SKU, name, unit, cost, and reorder point
+3. **Create suppliers**: Go to "Suppliers" -> "Add Supplier"
 
-### 採購入庫
+### Purchasing and Receiving
 
-1. 前往「採購單」→「新增採購單」
-2. 選擇供應商、目標倉庫，新增商品明細（數量、單價）
-3. 儲存後狀態為「草稿」，確認後點選「提交採購單」
-4. 收到貨品後點選「收貨」，輸入實際收到數量
-5. 系統自動建立入庫異動，更新對應倉庫的庫存水位
+1. Go to "Purchase Orders" -> "Add Purchase Order"
+2. Select the supplier and target warehouse, then add line items with quantity and unit price
+3. After saving, the order status is "Draft". Confirm it, then click "Submit Purchase Order"
+4. After receiving the goods, click "Receive" and enter the actual received quantity
+5. The system automatically creates inbound inventory movements and updates stock levels in the selected warehouse
 
-### 手動庫存異動
+### Manual Inventory Movements
 
-前往「新增異動」，選擇：
+Go to "Add Movement" and choose one of the following:
 
-| 類型 | 說明 |
+| Type | Description |
 |------|------|
-| 入庫 | 貨品進入倉庫 |
-| 出庫 | 貨品離開倉庫（銷售/領料） |
-| 盤點調增 | 盤點後實際數量多於系統 |
-| 盤點調減 | 盤點後實際數量少於系統 |
-| 倉庫轉入 | 從其他倉庫收到貨品 |
-| 倉庫轉出 | 移送貨品至其他倉庫 |
+| Inbound | Goods are added into a warehouse |
+| Outbound | Goods leave a warehouse (sales / material issue) |
+| Stock Count Increase | Physical count is higher than the system quantity |
+| Stock Count Decrease | Physical count is lower than the system quantity |
+| Warehouse Transfer In | Goods received from another warehouse |
+| Warehouse Transfer Out | Goods sent to another warehouse |
 
-### 低庫存警示
+### Low-Stock Alerts
 
-當商品在任一倉庫的庫存低於「再訂購點」時，儀表板會顯示警示。
-
----
-
-## 資料架構
-
-```
-users               — 用戶帳號（admin / staff）
-products            — 商品（SKU、名稱、成本、再訂購點）
-warehouses          — 倉庫
-stock_levels        — 各商品在各倉庫的即時庫存（product × warehouse）
-inventory_movements — 不可變更的庫存異動稽核日誌
-suppliers           — 供應商
-purchase_orders     — 採購單（draft→submitted→partial→received）
-purchase_order_lines — 採購單明細
-```
-
-**核心設計原則**：`stock_levels.quantity` 與 `inventory_movements` 的 INSERT 在同一個資料庫 transaction 中完成，確保資料一致性。
+When the stock of a product in any warehouse falls below its reorder point, the dashboard displays an alert.
 
 ---
 
-## 開發
+## Data Model
+
+```
+users               — User accounts (admin / staff)
+products            — Products (SKU, name, cost, reorder point)
+warehouses          — Warehouses
+stock_levels        — Real-time stock per product per warehouse (product × warehouse)
+inventory_movements — Immutable audit log of inventory movements
+suppliers           — Suppliers
+purchase_orders     — Purchase orders (draft -> submitted -> partial -> received)
+purchase_order_lines — Purchase order line items
+```
+
+**Core design principle:** Inserts into `stock_levels.quantity` and `inventory_movements` are executed within the same database transaction to ensure data consistency.
+
+---
+
+## Development
 
 ```bash
-# 執行測試
+# Run tests
 pytest tests/ -v
 ```
 

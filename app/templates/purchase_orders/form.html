@@ -75,7 +75,11 @@
 {% block scripts %}
 <script>
 const tbody = document.getElementById('lines-body');
-const products = {{ products | tojson(default=lambda o: {"id": o.id, "sku": o.sku, "name": o.name}) if products else '[]' }};
+const products = [
+  {% for p in products %}
+  { id: {{ p.id }}, sku: {{ p.sku|tojson }}, name: {{ p.name|tojson }} }{% if not loop.last %},{% endif %}
+  {% endfor %}
+];
 
 function buildProductOptions() {
   return '<option value="">— Select product —</option>' +
