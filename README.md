@@ -213,6 +213,8 @@ purchase_order_lines — Purchase order line items
 pytest tests/ -v
 ```
 
+Note: parts of this repository have been developed with OpenAI Codex assistance.
+
 ```bash
 # Install pre-commit into the project virtual environment
 pip install -r requirements.txt
