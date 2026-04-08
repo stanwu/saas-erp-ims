@@ -1,0 +1,80 @@
+{% from "partials/pagination.html" import render_pagination %}
+{% extends "base.html" %}
+{% block title %}{{ product.name }} — ERP IMS{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="mb-0">{{ product.name }} <span class="badge bg-secondary">{{ product.sku }}</span></h4>
+  <div>
+    {% if current_user.role.value == 'admin' %}
+    <a href="/products/{{ product.id }}/edit" class="btn btn-sm btn-outline-secondary">Edit</a>
+    {% endif %}
+    <a href="/products" class="btn btn-sm btn-outline-secondary ms-1">← Back</a>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-6">
+    <div class="card h-100">
+      <div class="card-header">Product Info</div>
+      <div class="card-body">
+        <dl class="row mb-0">
+          <dt class="col-5">Category</dt><dd class="col-7">{{ product.category.name if product.category else "—" }}</dd>
+          <dt class="col-5">Unit</dt><dd class="col-7">{{ product.unit }}</dd>
+          <dt class="col-5">Cost Price</dt><dd class="col-7">${{ "%.2f" | format(product.cost_price | float) }}</dd>
+          <dt class="col-5">Reorder Point</dt><dd class="col-7">{{ product.reorder_point }}</dd>
+          <dt class="col-5">Status</dt><dd class="col-7">
+            {% if product.is_active %}<span class="badge bg-success">Active</span>
+            {% else %}<span class="badge bg-secondary">Inactive</span>{% endif %}
+          </dd>
+          <dt class="col-5">Created</dt><dd class="col-7 small">{{ product.created_at.strftime("%Y-%m-%d") }}</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card h-100">
+      <div class="card-header">Stock by Warehouse</div>
+      <div class="table-responsive">
+        <table class="table table-sm mb-0">
+          <thead class="table-light"><tr><th>Warehouse</th><th>Qty</th></tr></thead>
+          <tbody>
+            {% for sl in stock_levels %}
+            <tr>
+              <td>{{ sl.warehouse.name if sl.warehouse else sl.warehouse_id }}</td>
+              <td><span class="badge {% if product.reorder_point > 0 and sl.quantity < product.reorder_point %}bg-danger{% else %}bg-success{% endif %}">{{ sl.quantity }}</span></td>
+            </tr>
+            {% else %}
+            <tr><td colspan="2" class="text-muted text-center">No stock records.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">Movement History</div>
+  <div class="table-responsive">
+    <table class="table table-sm mb-0">
+      <thead class="table-light"><tr><th>Date</th><th>Type</th><th>Qty</th><th>Warehouse</th><th>Note</th><th>By</th></tr></thead>
+      <tbody>
+        {% set labels = {"in": "入庫", "out": "出庫", "adjust_add": "盤點調增", "adjust_sub": "盤點調減", "transfer_in": "轉入", "transfer_out": "轉出"} %}
+        {% for m in movements %}
+        <tr>
+          <td class="small text-nowrap">{{ m.created_at.strftime("%Y-%m-%d %H:%M") }}</td>
+          <td><span class="badge bg-secondary">{{ labels.get(m.movement_type.value, m.movement_type.value) }}</span></td>
+          <td>{{ m.quantity }}</td>
+          <td class="small">{{ m.warehouse.name if m.warehouse else "—" }}</td>
+          <td class="small text-muted">{{ m.note or "—" }}</td>
+          <td class="small">{{ m.user.username if m.user else "—" }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6" class="text-center text-muted py-3">No movements.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{{ render_pagination(page, total_pages, "/products/" + product.id|string) }}
+{% endblock %}

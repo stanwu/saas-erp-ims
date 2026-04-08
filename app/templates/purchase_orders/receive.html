@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Receive Goods — {{ po.po_number }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="mb-0">Receive Goods: {{ po.po_number }}</h4>
+  <a href="/po/{{ po.id }}" class="btn btn-sm btn-outline-secondary">← Back</a>
+</div>
+
+{% if errors %}
+<div class="alert alert-danger">
+  <ul class="mb-0">
+    {% for e in errors %}<li>{{ e }}</li>{% endfor %}
+  </ul>
+</div>
+{% endif %}
+
+<div class="card">
+  <div class="card-body">
+    <p class="text-muted">Enter received quantities for each line. Leave 0 to skip a line.</p>
+    <form method="post" action="/po/{{ po.id }}/receive">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <div class="table-responsive mb-3">
+        <table class="table table-sm">
+          <thead class="table-light">
+            <tr><th>Product</th><th>Ordered</th><th>Already Received</th><th>Remaining</th><th>Receive Now</th></tr>
+          </thead>
+          <tbody>
+            {% for line in po.lines %}
+            {% set remaining = line.quantity_ordered - line.quantity_received %}
+            <tr>
+              <td>{{ line.product.sku }} — {{ line.product.name }}</td>
+              <td>{{ line.quantity_ordered }}</td>
+              <td>{{ line.quantity_received }}</td>
+              <td>{{ remaining }}</td>
+              <td>
+                <input type="number" name="qty_{{ line.id }}" class="form-control form-control-sm"
+                       style="width:100px" min="0" max="{{ remaining }}"
+                       value="{% if remaining > 0 %}{{ remaining }}{% else %}0{% endif %}"
+                       {% if remaining <= 0 %}disabled{% endif %}>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <button type="submit" class="btn btn-success">Confirm Receipt</button>
+      <a href="/po/{{ po.id }}" class="btn btn-outline-secondary ms-2">Cancel</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

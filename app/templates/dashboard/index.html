@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — ERP IMS{% endblock %}
+{% block content %}
+<h4 class="mb-4">Dashboard</h4>
+
+<div class="row g-3 mb-4">
+  <div class="col-sm-6 col-lg-3">
+    <div class="card text-bg-primary">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <div class="fs-2 fw-bold">{{ product_count }}</div>
+            <div class="small">Active Products</div>
+          </div>
+          <i class="bi bi-box-seam fs-1 opacity-50"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-3">
+    <div class="card text-bg-{% if open_po_count > 0 %}warning{% else %}success{% endif %}">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <div class="fs-2 fw-bold">{{ open_po_count }}</div>
+            <div class="small">Open Purchase Orders</div>
+          </div>
+          <i class="bi bi-receipt fs-1 opacity-50"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-3">
+    <div class="card text-bg-{% if low_stock|length > 0 %}danger{% else %}success{% endif %}">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <div class="fs-2 fw-bold">{{ low_stock|length }}</div>
+            <div class="small">Low Stock Alerts</div>
+          </div>
+          <i class="bi bi-exclamation-triangle fs-1 opacity-50"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-3">
+    <div class="card text-bg-info">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <div class="fs-2 fw-bold">{{ total_movements }}</div>
+            <div class="small">Total Movements</div>
+          </div>
+          <i class="bi bi-arrow-left-right fs-1 opacity-50"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if low_stock %}
+<div class="card mb-4 border-danger">
+  <div class="card-header bg-danger text-white"><i class="bi bi-exclamation-triangle"></i> Low Stock Alerts</div>
+  <div class="table-responsive">
+    <table class="table table-sm mb-0">
+      <thead class="table-light"><tr><th>SKU</th><th>Product</th><th>Warehouse</th><th>Current Stock</th><th>Reorder Point</th></tr></thead>
+      <tbody>
+        {% for product, stock in low_stock %}
+        <tr>
+          <td><a href="/products/{{ product.id }}">{{ product.sku }}</a></td>
+          <td>{{ product.name }}</td>
+          <td>{{ stock.warehouse.name if stock.warehouse else "—" }}</td>
+          <td><span class="badge bg-danger">{{ stock.quantity }}</span></td>
+          <td>{{ product.reorder_point }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+
+<div class="card">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <span><i class="bi bi-clock-history"></i> Recent Movements</span>
+    <a href="/movements" class="btn btn-sm btn-outline-secondary">View All</a>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-sm mb-0">
+      <thead class="table-light"><tr><th>Time</th><th>Product</th><th>Warehouse</th><th>Type</th><th>Qty</th><th>By</th></tr></thead>
+      <tbody>
+        {% for m in recent_movements %}
+        <tr>
+          <td class="text-nowrap small">{{ m.created_at.strftime("%m/%d %H:%M") }}</td>
+          <td><a href="/products/{{ m.product_id }}">{{ m.product.name if m.product else m.product_id }}</a></td>
+          <td>{{ m.warehouse.name if m.warehouse else "—" }}</td>
+          <td>
+            {% set labels = {"in": "入庫", "out": "出庫", "adjust_add": "盤點調增", "adjust_sub": "盤點調減", "transfer_in": "轉入", "transfer_out": "轉出"} %}
+            <span class="badge bg-secondary">{{ labels.get(m.movement_type.value, m.movement_type.value) }}</span>
+          </td>
+          <td>{{ m.quantity }}</td>
+          <td class="small">{{ m.user.username if m.user else "—" }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6" class="text-center text-muted py-3">No movements yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

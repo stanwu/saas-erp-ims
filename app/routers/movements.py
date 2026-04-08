@@ -1,33 +1,68 @@
+import math
+
 from fastapi import APIRouter, Depends, Form, Request
 from fastapi.responses import RedirectResponse
-from sqlalchemy import select
+from fastapi.templating import Jinja2Templates
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session, joinedload
 
+from app.config import get_settings
 from app.database import get_db
-from app.dependencies import get_current_user
-from app.models import InventoryMovement, MovementType, Product, User
-from app.services import apply_inventory_movement
-from app.templates import templates
-
+from app.dependencies import flash, get_current_user, tmpl_ctx, validate_csrf
+from app.models import InventoryMovement, MOVEMENT_LABELS, MovementType, Product, User, Warehouse
 
 router = APIRouter(prefix="/movements", tags=["movements"])
+templates = Jinja2Templates(directory="app/templates")
+settings = get_settings()
 
 
 @router.get("")
 def list_movements(
     request: Request,
+    page: int = 1,
+    warehouse_id: str = "",
+    movement_type: str = "",
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    movements = db.scalars(
+    per_page = settings.page_size
+    stmt = (
         select(InventoryMovement)
-        .options(joinedload(InventoryMovement.product), joinedload(InventoryMovement.user))
-        .order_by(InventoryMovement.created_at.desc())
+        .options(
+            joinedload(InventoryMovement.product),
+            joinedload(InventoryMovement.warehouse),
+            joinedload(InventoryMovement.user),
+        )
+    )
+    if warehouse_id:
+        stmt = stmt.where(InventoryMovement.warehouse_id == int(warehouse_id))
+    if movement_type:
+        stmt = stmt.where(InventoryMovement.movement_type == MovementType(movement_type))
+
+    total = db.scalar(select(func.count()).select_from(stmt.subquery())) or 0
+    total_pages = max(1, math.ceil(total / per_page))
+    page = max(1, min(page, total_pages))
+    movements = db.scalars(
+        stmt.order_by(InventoryMovement.created_at.desc())
+        .offset((page - 1) * per_page).limit(per_page)
     ).all()
+
+    warehouses = db.scalars(select(Warehouse).order_by(Warehouse.name)).all()
+    extra_params = ""
+    if warehouse_id:
+        extra_params += f"&warehouse_id={warehouse_id}"
+    if movement_type:
+        extra_params += f"&movement_type={movement_type}"
+
     return templates.TemplateResponse(
         request,
-        "movements.html",
-        {"current_user": current_user, "movements": movements},
+        "movements/list.html",
+        tmpl_ctx(request, current_user,
+                 movements=movements, warehouses=warehouses,
+                 movement_types=list(MovementType), movement_labels=MOVEMENT_LABELS,
+                 selected_warehouse=warehouse_id, selected_type=movement_type,
+                 page=page, total_pages=total_pages, total=total,
+                 extra_params=extra_params),
     )
 
 
@@ -37,69 +72,52 @@ def new_movement_page(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    products = db.scalars(select(Product).order_by(Product.name.asc())).all()
+    products = db.scalars(select(Product).where(Product.is_active == True).order_by(Product.name)).all()  # noqa: E712
+    warehouses = db.scalars(select(Warehouse).where(Warehouse.is_active == True).order_by(Warehouse.name)).all()  # noqa: E712
     return templates.TemplateResponse(
         request,
-        "movement_form.html",
-        {
-            "current_user": current_user,
-            "products": products,
-            "movement_types": list(MovementType),
-            "error": None,
-            "form": {},
-        },
+        "movements/form.html",
+        tmpl_ctx(request, current_user,
+                 products=products, warehouses=warehouses,
+                 movement_types=list(MovementType), movement_labels=MOVEMENT_LABELS,
+                 error=None, form={}),
     )
 
 
 @router.post("/new")
-def create_movement(
+async def create_movement(
     request: Request,
     product_id: int = Form(...),
+    warehouse_id: int = Form(...),
     movement_type: str = Form(...),
     quantity: int = Form(...),
     note: str = Form(""),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
+    _: None = Depends(validate_csrf),
 ):
-    products = db.scalars(select(Product).order_by(Product.name.asc())).all()
-    product = db.get(Product, product_id)
-    if not product:
-        return templates.TemplateResponse(
-            request,
-            "movement_form.html",
-            {
-                "current_user": current_user,
-                "products": products,
-                "movement_types": list(MovementType),
-                "error": "Product not found.",
-                "form": {"product_id": product_id, "movement_type": movement_type, "quantity": quantity, "note": note},
-            },
-            status_code=400,
-        )
+    from app.services import record_movement
+
+    products = db.scalars(select(Product).where(Product.is_active == True).order_by(Product.name)).all()  # noqa: E712
+    warehouses = db.scalars(select(Warehouse).where(Warehouse.is_active == True).order_by(Warehouse.name)).all()  # noqa: E712
+    form_data = {"product_id": product_id, "warehouse_id": warehouse_id,
+                 "movement_type": movement_type, "quantity": quantity, "note": note}
 
     try:
-        movement_enum = MovementType(movement_type)
-        apply_inventory_movement(
-            db,
-            product=product,
-            actor=current_user,
-            movement_type=movement_enum,
-            quantity=quantity,
-            note=note,
-        )
-    except ValueError as exc:
+        mov_type = MovementType(movement_type)
+        record_movement(db, product_id, warehouse_id, mov_type, quantity, current_user.id, note=note)
+        db.commit()
+    except (ValueError, Exception) as exc:
         db.rollback()
         return templates.TemplateResponse(
             request,
-            "movement_form.html",
-            {
-                "current_user": current_user,
-                "products": products,
-                "movement_types": list(MovementType),
-                "error": str(exc),
-                "form": {"product_id": product_id, "movement_type": movement_type, "quantity": quantity, "note": note},
-            },
+            "movements/form.html",
+            tmpl_ctx(request, current_user,
+                     products=products, warehouses=warehouses,
+                     movement_types=list(MovementType), movement_labels=MOVEMENT_LABELS,
+                     error=str(exc), form=form_data),
             status_code=400,
         )
 
+    flash(request, "Movement recorded.", "success")
     return RedirectResponse(url="/movements", status_code=303)

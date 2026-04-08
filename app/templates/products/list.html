@@ -1,0 +1,62 @@
+{% from "partials/pagination.html" import render_pagination %}
+{% extends "base.html" %}
+{% block title %}Products — ERP IMS{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="mb-0">Products <span class="badge bg-secondary fs-6">{{ total }}</span></h4>
+  {% if current_user.role.value == 'admin' %}
+  <a href="/products/new" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> New Product</a>
+  {% endif %}
+</div>
+
+<form method="get" class="mb-3">
+  <div class="input-group input-group-sm" style="max-width:400px">
+    <input type="text" name="q" class="form-control" placeholder="Search name or SKU…" value="{{ q }}">
+    <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-search"></i></button>
+    {% if q %}<a href="/products" class="btn btn-outline-danger">✕</a>{% endif %}
+  </div>
+</form>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table table-hover table-sm mb-0">
+      <thead class="table-light">
+        <tr><th>SKU</th><th>Name</th><th>Category</th><th>Unit</th><th>Reorder Pt</th><th>Total Stock</th><th>Status</th><th></th></tr>
+      </thead>
+      <tbody>
+        {% for p in products %}
+        <tr>
+          <td><a href="/products/{{ p.id }}">{{ p.sku }}</a></td>
+          <td>{{ p.name }}</td>
+          <td class="text-muted small">{{ p.category.name if p.category else "—" }}</td>
+          <td class="small">{{ p.unit }}</td>
+          <td class="small">{{ p.reorder_point }}</td>
+          <td>
+            {% set stock = stock_totals.get(p.id, 0) %}
+            <span class="badge {% if p.reorder_point > 0 and stock < p.reorder_point %}bg-danger{% else %}bg-success{% endif %}">{{ stock }}</span>
+          </td>
+          <td>
+            {% if p.is_active %}<span class="badge bg-success">Active</span>
+            {% else %}<span class="badge bg-secondary">Inactive</span>{% endif %}
+          </td>
+          <td class="text-end">
+            {% if current_user.role.value == 'admin' %}
+            <a href="/products/{{ p.id }}/edit" class="btn btn-xs btn-outline-secondary btn-sm py-0 px-1">Edit</a>
+            <form method="post" action="/products/{{ p.id }}/deactivate" class="d-inline">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+              <button class="btn btn-xs btn-outline-{% if p.is_active %}warning{% else %}success{% endif %} btn-sm py-0 px-1" type="submit">
+                {% if p.is_active %}Deactivate{% else %}Activate{% endif %}
+              </button>
+            </form>
+            {% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="8" class="text-center text-muted py-4">No products found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{{ render_pagination(page, total_pages, "/products", "&q=" + q if q else "") }}
+{% endblock %}
