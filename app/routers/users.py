@@ -1,97 +1,158 @@
+import math
+
 from fastapi import APIRouter, Depends, Form, Request
 from fastapi.responses import RedirectResponse
-from sqlalchemy import select
+from fastapi.templating import Jinja2Templates
+from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
+from app.config import get_settings
 from app.database import get_db
-from app.dependencies import require_role
+from app.dependencies import flash, require_admin, tmpl_ctx, validate_csrf
 from app.models import User, UserRole
 from app.security import hash_password
-from app.templates import templates
-
 
 router = APIRouter(prefix="/users", tags=["users"])
+templates = Jinja2Templates(directory="app/templates")
+settings = get_settings()
 
 
 @router.get("")
 def list_users(
     request: Request,
-    current_user: User = Depends(require_role(UserRole.ADMIN)),
+    page: int = 1,
+    current_user: User = Depends(require_admin),
     db: Session = Depends(get_db),
 ):
-    users = db.scalars(select(User).order_by(User.created_at.desc())).all()
+    per_page = settings.page_size
+    total = db.scalar(select(func.count(User.id))) or 0
+    total_pages = max(1, math.ceil(total / per_page))
+    page = max(1, min(page, total_pages))
+    users = db.scalars(
+        select(User).order_by(User.created_at.desc())
+        .offset((page - 1) * per_page).limit(per_page)
+    ).all()
     return templates.TemplateResponse(
         request,
-        "users.html",
-        {"current_user": current_user, "users": users, "roles": list(UserRole), "error": None},
+        "users/list.html",
+        tmpl_ctx(request, current_user, users=users, page=page, total_pages=total_pages, total=total),
     )
 
 
-@router.post("")
-def create_user(
+@router.get("/new")
+def new_user_page(
+    request: Request,
+    current_user: User = Depends(require_admin),
+):
+    return templates.TemplateResponse(
+        request,
+        "users/form.html",
+        tmpl_ctx(request, current_user, user=None, roles=list(UserRole), error=None),
+    )
+
+
+@router.post("/new")
+async def create_user(
     request: Request,
     username: str = Form(...),
-    email: str = Form(...),
     password: str = Form(...),
-    role: str = Form(...),
-    is_active: bool = Form(False),
-    current_user: User = Depends(require_role(UserRole.ADMIN)),
+    role: str = Form("staff"),
+    is_active: str = Form(""),
+    current_user: User = Depends(require_admin),
     db: Session = Depends(get_db),
+    _: None = Depends(validate_csrf),
 ):
-    try:
-        user_role = UserRole(role)
-    except ValueError:
-        users = db.scalars(select(User).order_by(User.created_at.desc())).all()
-        return templates.TemplateResponse(
-            request,
-            "users.html",
-            {
-                "current_user": current_user,
-                "users": users,
-                "roles": list(UserRole),
-                "error": "Invalid role.",
-            },
-            status_code=400,
-        )
-
     if len(password) < 8:
-        users = db.scalars(select(User).order_by(User.created_at.desc())).all()
         return templates.TemplateResponse(
             request,
-            "users.html",
-            {
-                "current_user": current_user,
-                "users": users,
-                "roles": list(UserRole),
-                "error": "Password must be at least 8 characters.",
-            },
+            "users/form.html",
+            tmpl_ctx(request, current_user, user=None, roles=list(UserRole),
+                     error="Password must be at least 8 characters."),
             status_code=400,
         )
-
     user = User(
         username=username.strip(),
-        email=email.strip(),
         password_hash=hash_password(password),
-        role=user_role,
-        is_active=is_active,
+        role=UserRole(role),
+        is_active=bool(is_active),
     )
     db.add(user)
     try:
         db.commit()
     except IntegrityError:
         db.rollback()
-        users = db.scalars(select(User).order_by(User.created_at.desc())).all()
         return templates.TemplateResponse(
             request,
-            "users.html",
-            {
-                "current_user": current_user,
-                "users": users,
-                "roles": list(UserRole),
-                "error": "Username and email must be unique.",
-            },
+            "users/form.html",
+            tmpl_ctx(request, current_user, user=None, roles=list(UserRole),
+                     error="Username already exists."),
             status_code=400,
         )
+    flash(request, f"User '{username}' created.", "success")
+    return RedirectResponse(url="/users", status_code=303)
 
+
+@router.get("/{user_id}/edit")
+def edit_user_page(
+    user_id: int,
+    request: Request,
+    current_user: User = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    user = db.get(User, user_id)
+    if not user:
+        return RedirectResponse(url="/users", status_code=303)
+    return templates.TemplateResponse(
+        request,
+        "users/form.html",
+        tmpl_ctx(request, current_user, user=user, roles=list(UserRole), error=None),
+    )
+
+
+@router.post("/{user_id}/edit")
+async def edit_user(
+    user_id: int,
+    request: Request,
+    role: str = Form(...),
+    is_active: str = Form(""),
+    new_password: str = Form(""),
+    current_user: User = Depends(require_admin),
+    db: Session = Depends(get_db),
+    _: None = Depends(validate_csrf),
+):
+    user = db.get(User, user_id)
+    if not user:
+        return RedirectResponse(url="/users", status_code=303)
+    user.role = UserRole(role)
+    user.is_active = bool(is_active)
+    if new_password:
+        if len(new_password) < 8:
+            return templates.TemplateResponse(
+                request,
+                "users/form.html",
+                tmpl_ctx(request, current_user, user=user, roles=list(UserRole),
+                         error="Password must be at least 8 characters."),
+                status_code=400,
+            )
+        user.password_hash = hash_password(new_password)
+    db.commit()
+    flash(request, f"User '{user.username}' updated.", "success")
+    return RedirectResponse(url="/users", status_code=303)
+
+
+@router.post("/{user_id}/toggle")
+async def toggle_user(
+    user_id: int,
+    request: Request,
+    current_user: User = Depends(require_admin),
+    db: Session = Depends(get_db),
+    _: None = Depends(validate_csrf),
+):
+    user = db.get(User, user_id)
+    if user and user.id != current_user.id:
+        user.is_active = not user.is_active
+        db.commit()
+        status = "activated" if user.is_active else "deactivated"
+        flash(request, f"User '{user.username}' {status}.", "success")
     return RedirectResponse(url="/users", status_code=303)

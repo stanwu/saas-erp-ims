@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block title %}New Purchase Order — ERP IMS{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="mb-0">New Purchase Order</h4>
+  <a href="/po" class="btn btn-sm btn-outline-secondary">← Back</a>
+</div>
+
+{% if error %}
+<div class="alert alert-danger">{{ error }}</div>
+{% endif %}
+
+<div class="card">
+  <div class="card-body">
+    <form method="post" action="/po/new" id="po-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <div class="row g-3 mb-4">
+        <div class="col-md-4">
+          <label class="form-label">Supplier <span class="text-danger">*</span></label>
+          <select name="supplier_id" class="form-select" required>
+            <option value="">— Select —</option>
+            {% for s in suppliers %}
+            <option value="{{ s.id }}">{{ s.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Warehouse <span class="text-danger">*</span></label>
+          <select name="warehouse_id" class="form-select" required>
+            <option value="">— Select —</option>
+            {% for w in warehouses %}
+            <option value="{{ w.id }}">{{ w.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Expected Delivery</label>
+          <input type="date" name="expected_at" class="form-control">
+        </div>
+      </div>
+
+      <h6>Line Items</h6>
+      <div class="table-responsive mb-3">
+        <table class="table table-sm" id="lines-table">
+          <thead class="table-light">
+            <tr><th>Product</th><th>Quantity</th><th>Unit Cost</th><th></th></tr>
+          </thead>
+          <tbody id="lines-body">
+            <tr class="line-row">
+              <td>
+                <select name="product_id[]" class="form-select form-select-sm" required>
+                  <option value="">— Select product —</option>
+                  {% for p in products %}
+                  <option value="{{ p.id }}">{{ p.sku }} — {{ p.name }}</option>
+                  {% endfor %}
+                </select>
+              </td>
+              <td><input type="number" name="quantity[]" class="form-control form-control-sm" min="1" required></td>
+              <td><input type="number" name="unit_cost[]" class="form-control form-control-sm" step="0.01" min="0" value="0"></td>
+              <td><button type="button" class="btn btn-sm btn-outline-danger remove-line" disabled>✕</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <button type="button" class="btn btn-sm btn-outline-secondary mb-3" id="add-line"><i class="bi bi-plus"></i> Add Line</button>
+
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary">Create Draft PO</button>
+        <a href="/po" class="btn btn-outline-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+const tbody = document.getElementById('lines-body');
+const products = [
+  {% for p in products %}
+  { id: {{ p.id }}, sku: {{ p.sku|tojson }}, name: {{ p.name|tojson }} }{% if not loop.last %},{% endif %}
+  {% endfor %}
+];
+
+function buildProductOptions() {
+  return '<option value="">— Select product —</option>' +
+    products.map(p => `<option value="${p.id}">${p.sku} — ${p.name}</option>`).join('');
+}
+
+document.getElementById('add-line').addEventListener('click', () => {
+  const row = document.createElement('tr');
+  row.className = 'line-row';
+  row.innerHTML = `
+    <td><select name="product_id[]" class="form-select form-select-sm" required>${buildProductOptions()}</select></td>
+    <td><input type="number" name="quantity[]" class="form-control form-control-sm" min="1" required></td>
+    <td><input type="number" name="unit_cost[]" class="form-control form-control-sm" step="0.01" min="0" value="0"></td>
+    <td><button type="button" class="btn btn-sm btn-outline-danger remove-line">✕</button></td>`;
+  tbody.appendChild(row);
+  updateRemoveButtons();
+});
+
+tbody.addEventListener('click', e => {
+  if (e.target.classList.contains('remove-line')) {
+    e.target.closest('tr').remove();
+    updateRemoveButtons();
+  }
+});
+
+function updateRemoveButtons() {
+  const rows = tbody.querySelectorAll('.line-row');
+  rows.forEach((r, i) => {
+    const btn = r.querySelector('.remove-line');
+    btn.disabled = rows.length === 1;
+  });
+}
+</script>
+{% endblock %}

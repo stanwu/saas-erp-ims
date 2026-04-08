@@ -4,10 +4,10 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 
-from app.bootstrap import init_db, seed_admin
+from app.bootstrap import init_db, seed_initial_data
 from app.config import get_settings
 from app.database import SessionLocal
-from app.routers import auth, dashboard, movements, products, users
+from app.routers import auth, dashboard, movements, products, purchase_orders, suppliers, users, warehouses
 
 
 @asynccontextmanager
@@ -15,7 +15,7 @@ async def lifespan(_: FastAPI):
     init_db()
     db = SessionLocal()
     try:
-        seed_admin(db)
+        seed_initial_data(db)
     finally:
         db.close()
     yield
@@ -31,3 +31,6 @@ app.include_router(dashboard.router)
 app.include_router(products.router)
 app.include_router(movements.router)
 app.include_router(users.router)
+app.include_router(suppliers.router)
+app.include_router(warehouses.router)
+app.include_router(purchase_orders.router)

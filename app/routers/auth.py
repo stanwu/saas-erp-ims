@@ -1,21 +1,27 @@
 from fastapi import APIRouter, Depends, Form, Request
 from fastapi.responses import RedirectResponse
+from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.security import verify_password
+from app.dependencies import flash, generate_csrf_token
 from app.services import authenticate_user
-from app.templates import templates
-
 
 router = APIRouter()
+templates = Jinja2Templates(directory="app/templates")
+
+
+@router.get("/")
+def root():
+    return RedirectResponse(url="/dashboard", status_code=303)
 
 
 @router.get("/login")
 def login_page(request: Request):
     if request.session.get("user_id"):
         return RedirectResponse(url="/dashboard", status_code=303)
-    return templates.TemplateResponse(request, "login.html", {"error": None})
+    csrf_token = generate_csrf_token(request)
+    return templates.TemplateResponse(request, "auth/login.html", {"csrf_token": csrf_token, "error": None})
 
 
 @router.post("/login")
@@ -23,18 +29,31 @@ def login(
     request: Request,
     username: str = Form(...),
     password: str = Form(...),
+    csrf_token: str = Form(...),
     db: Session = Depends(get_db),
 ):
-    user = authenticate_user(db, username, verify_password, password)
-    if not user:
+    from app.dependencies import validate_csrf
+    try:
+        validate_csrf(request, csrf_token)
+    except Exception:
+        new_csrf = generate_csrf_token(request)
         return templates.TemplateResponse(
-            request,
-            "login.html",
-            {"error": "Invalid credentials."},
-            status_code=400,
+            request, "auth/login.html",
+            {"csrf_token": new_csrf, "error": "Invalid request. Please try again."},
+            status_code=403,
+        )
+
+    user = authenticate_user(db, username, password)
+    if not user:
+        new_csrf = generate_csrf_token(request)
+        return templates.TemplateResponse(
+            request, "auth/login.html",
+            {"csrf_token": new_csrf, "error": "Invalid username or password."},
+            status_code=401,
         )
 
     request.session["user_id"] = user.id
+    flash(request, f"Welcome back, {user.username}!", "success")
     return RedirectResponse(url="/dashboard", status_code=303)
 
 

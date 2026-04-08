@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.config import get_settings
 from app.database import Base, engine
-from app.models import User, UserRole
+from app.models import Category, User, UserRole, Warehouse
 from app.security import hash_password
 
 
@@ -11,18 +11,22 @@ def init_db() -> None:
     Base.metadata.create_all(bind=engine)
 
 
-def seed_admin(db: Session) -> None:
+def seed_initial_data(db: Session) -> None:
     settings = get_settings()
-    existing_admin = db.scalar(select(User).where(User.username == settings.admin_username))
-    if existing_admin:
-        return
 
-    admin = User(
-        username=settings.admin_username,
-        email=settings.admin_email,
-        password_hash=hash_password(settings.admin_password),
-        role=UserRole.ADMIN,
-        is_active=True,
-    )
-    db.add(admin)
+    if not db.scalar(select(User).where(User.username == settings.admin_username)):
+        admin = User(
+            username=settings.admin_username,
+            password_hash=hash_password(settings.admin_password),
+            role=UserRole.admin,
+            is_active=True,
+        )
+        db.add(admin)
+
+    if not db.scalar(select(Warehouse).where(Warehouse.name == "Main Warehouse")):
+        db.add(Warehouse(name="Main Warehouse", location="Default", is_active=True))
+
+    if not db.scalar(select(Category).where(Category.name == "General")):
+        db.add(Category(name="General", description="General category"))
+
     db.commit()
