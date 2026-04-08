@@ -1,0 +1,20 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: erp-ims-web
+    ports:
+      - "8000:8000"
+    environment:
+      ERP_IMS_SECRET_KEY: change-me-in-production
+      ERP_IMS_CSRF_SECRET: change-me-in-production
+      ERP_IMS_DATABASE_URL: sqlite:////data/erp_ims.db
+      ERP_IMS_ADMIN_USERNAME: admin
+      ERP_IMS_ADMIN_PASSWORD: admin12345
+    volumes:
+      - erp_ims_data:/data
+    restart: unless-stopped
+
+volumes:
+  erp_ims_data:

@@ -1,0 +1,17 @@
+.git
+.github
+.venv
+.pytest_cache
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.db-wal
+*.db-shm
+dist
+build
+*.egg-info
+.claude
+docs/screenshots
+tests

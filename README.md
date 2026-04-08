@@ -124,6 +124,16 @@ uvicorn app.main:app --reload
 
 Open your browser and go to **http://localhost:8000/login**
 
+### Docker Compose
+
+```bash
+docker compose up --build
+```
+
+The application will be available at **http://localhost:8000/login**.
+
+SQLite data is stored in the Docker volume `erp_ims_data`.
+
 ### Default Account
 
 | Username | Password | Role |
