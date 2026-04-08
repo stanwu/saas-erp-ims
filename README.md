@@ -5,6 +5,7 @@ A lightweight inventory and purchasing management system built with **FastAPI + 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.12%2B-blue)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.116-green)](https://fastapi.tiangolo.com/)
+[![CI](https://github.com/stanwu/saas-erp-ims/actions/workflows/unit-tests.yml/badge.svg)](https://github.com/stanwu/saas-erp-ims/actions/workflows/unit-tests.yml)
 
 ---
 
