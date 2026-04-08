@@ -202,6 +202,15 @@ purchase_order_lines — Purchase order line items
 pytest tests/ -v
 ```
 
+```bash
+# Install pre-commit into the project virtual environment
+pip install -r requirements.txt
+.venv/bin/pre-commit install
+
+# Run the sensitive data scan manually
+.venv/bin/pre-commit run --all-files
+```
+
 ---
 
 ## License

@@ -1,0 +1,9 @@
+repos:
+  - repo: local
+    hooks:
+      - id: sensitive-data-scan
+        name: Scan for sensitive data and likely PII
+        entry: .venv/bin/python scripts/check_sensitive_data.py
+        language: system
+        pass_filenames: true
+        types_or: [text]

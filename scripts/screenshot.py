@@ -134,13 +134,13 @@ async def seed_data(page):
             "name": "Taiwan Electronic Components Co.",
             "contact_person": "David Wang",
             "email": "supply@example.com",
-            "phone": "02-1234-5678",
+            "phone": "02-1234-5678",  # sensitive-data: allow
         },
         {
             "name": "South China Industrial Materials Ltd.",
             "contact_person": "Ivy Lin",
             "email": "procurement@hn-materials.example",
-            "phone": "03-5678-9000",
+            "phone": "03-5678-9000",  # sensitive-data: allow
         },
         {
             "name": "Global Components Trading",
