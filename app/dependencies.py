@@ -7,6 +7,10 @@ from app.database import get_db
 from app.models import User, UserRole
 
 
+def _csrf_subject(request: Request) -> str:
+    return str(request.session.get("user_id", "anonymous"))
+
+
 def get_current_user(request: Request, db: Session = Depends(get_db)) -> User:
     user_id = request.session.get("user_id")
     if not user_id:
@@ -28,15 +32,17 @@ def require_admin(current_user: User = Depends(get_current_user)) -> User:
 def generate_csrf_token(request: Request) -> str:
     settings = get_settings()
     s = URLSafeTimedSerializer(settings.csrf_secret)
-    return s.dumps(request.session.get("user_id", "anonymous"))
+    return s.dumps(_csrf_subject(request))
 
 
 def validate_csrf(request: Request, csrf_token: str = Form(...)) -> None:
     settings = get_settings()
     s = URLSafeTimedSerializer(settings.csrf_secret)
     try:
-        s.loads(csrf_token, max_age=3600)
+        subject = s.loads(csrf_token, max_age=3600)
     except (BadSignature, SignatureExpired):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid CSRF token")
+    if subject != _csrf_subject(request):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid CSRF token")
 
 

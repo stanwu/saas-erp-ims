@@ -52,6 +52,7 @@ def login(
             status_code=401,
         )
 
+    request.session.clear()
     request.session["user_id"] = user.id
     flash(request, f"Welcome back, {user.username}!", "success")
     return RedirectResponse(url="/dashboard", status_code=303)
