@@ -86,6 +86,15 @@ def test_logout_clears_session():
         assert resp.status_code == 303
 
 
+def test_logout_redirects_back_to_login_page():
+    with TestClient(app) as client:
+        login_admin(client)
+        csrf = _get_csrf(client)
+        resp = client.post("/logout", data={"csrf_token": csrf}, follow_redirects=True)
+        assert resp.status_code == 200
+        assert 'action="/login"' in resp.text
+
+
 # ---------------------------------------------------------------------------
 # Product CRUD
 # ---------------------------------------------------------------------------
@@ -388,6 +397,23 @@ def test_staff_cannot_access_warehouses():
 
         resp = client.get("/warehouses", follow_redirects=False)
         assert resp.status_code == 403
+
+
+def test_staff_sidebar_hides_admin_only_links():
+    with TestClient(app) as client:
+        csrf = _get_csrf(client)
+        resp = client.post(
+            "/login",
+            data={"username": "staff_user", "password": "staffpass", "csrf_token": csrf},
+            follow_redirects=False,
+        )
+        if resp.status_code != 303:
+            return  # user not created yet, skip
+
+        resp = client.get("/dashboard")
+        assert resp.status_code == 200
+        assert "Warehouses" not in resp.text
+        assert "Users" not in resp.text
 
 
 def test_staff_cannot_create_product():

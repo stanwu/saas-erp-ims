@@ -4,7 +4,7 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.dependencies import flash, generate_csrf_token
+from app.dependencies import flash, generate_csrf_token, validate_csrf
 from app.services import authenticate_user
 
 router = APIRouter()
@@ -58,6 +58,11 @@ def login(
 
 
 @router.post("/logout")
-def logout(request: Request):
+def logout(
+    request: Request,
+    _: None = Depends(validate_csrf),
+):
     request.session.clear()
-    return RedirectResponse(url="/login", status_code=303)
+    response = RedirectResponse(url="/login", status_code=303)
+    response.delete_cookie("session")
+    return response

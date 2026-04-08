@@ -36,8 +36,8 @@
         <li><a class="nav-link {% if '/movements' in request.url.path %}active{% endif %}" href="/movements"><i class="bi bi-arrow-left-right"></i> Movements</a></li>
         <li><a class="nav-link {% if '/suppliers' in request.url.path %}active{% endif %}" href="/suppliers"><i class="bi bi-truck"></i> Suppliers</a></li>
         <li><a class="nav-link {% if '/po' in request.url.path %}active{% endif %}" href="/po"><i class="bi bi-receipt"></i> Purchase Orders</a></li>
-        <li><a class="nav-link {% if '/warehouses' in request.url.path %}active{% endif %}" href="/warehouses"><i class="bi bi-building"></i> Warehouses</a></li>
         {% if current_user and current_user.role.value == 'admin' %}
+        <li><a class="nav-link {% if '/warehouses' in request.url.path %}active{% endif %}" href="/warehouses"><i class="bi bi-building"></i> Warehouses</a></li>
         <li class="mt-2"><hr class="border-secondary my-1"></li>
         <li><a class="nav-link {% if '/users' in request.url.path %}active{% endif %}" href="/users"><i class="bi bi-people"></i> Users</a></li>
         {% endif %}
