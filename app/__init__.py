@@ -1,1 +1,1 @@
-"""ERP IMS application package."""
+"""Stanis IMS application package."""

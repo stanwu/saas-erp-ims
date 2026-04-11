@@ -1,5 +1,5 @@
 """
-Integration tests for the ERP IMS rewrite.
+Integration tests for the Stanis IMS rewrite.
 Covers: login/logout, product CRUD, record_movement, PO flow, permissions.
 """
 import os

@@ -1,4 +1,4 @@
-# ERP IMS - Inventory Management System SaaS
+# Stanis IMS - Inventory Management System SaaS
 
 A lightweight inventory and purchasing management system built with **FastAPI + SQLite3**. It supports multi-user accounts (admin / staff) and is suitable for self-hosted deployment in small to medium-sized businesses.
 

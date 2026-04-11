@@ -15,7 +15,7 @@ INSECURE_CSRF_SECRETS = {
 }
 class Settings:
     def __init__(self) -> None:
-        self.app_name = "ERP IMS"
+        self.app_name = "Stanis IMS"
         self.secret_key = os.getenv("ERP_IMS_SECRET_KEY", "dev-secret-key-change-in-prod")
         self.csrf_secret = os.getenv("ERP_IMS_CSRF_SECRET", "csrf-secret-change-in-prod")
         self.environment = os.getenv("ERP_IMS_ENV", "development").strip().lower()
