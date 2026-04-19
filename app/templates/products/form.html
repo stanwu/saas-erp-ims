@@ -17,7 +17,8 @@
       <div class="row g-3">
         {% if not product %}
         <div class="col-md-4">
-          <label class="form-label">SKU <span class="text-danger">*</span></label>          <input type="text" name="sku" class="form-control" value="{{ product.sku if product else '' }}" required>
+          <label class="form-label">SKU <span class="text-danger">*</span></label>
+          <input type="text" name="sku" class="form-control" value="{{ product.sku if product else '' }}" required>
         </div>
         {% endif %}
         <div class="col-md-{% if product %}6{% else %}8{% endif %}">
