@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,7 +21,7 @@
   <form method="post" action="/logout" class="d-flex align-items-center gap-2">
     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
     <span class="text-light small">{{ current_user.username if current_user else "" }}</span>
-    <button class="btn btn-sm btn-outline-light" type="submit"><i class="bi bi-box-arrow-right"></i> Logout</button>
+    <button class="btn btn-sm btn-outline-light" type="submit"><i class="bi bi-box-arrow-right"></i> 登出</button>
   </form>
   {% endif %}
 </nav>
@@ -31,15 +31,15 @@
     {% if request.session.get("user_id") %}
     <nav class="col-md-2 sidebar py-3 d-none d-md-block">
       <ul class="nav flex-column gap-1">
-        <li><a class="nav-link {% if request.url.path == '/dashboard' %}active{% endif %}" href="/dashboard"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
-        <li><a class="nav-link {% if '/products' in request.url.path %}active{% endif %}" href="/products"><i class="bi bi-box-seam"></i> Products</a></li>
-        <li><a class="nav-link {% if '/movements' in request.url.path %}active{% endif %}" href="/movements"><i class="bi bi-arrow-left-right"></i> Movements</a></li>
-        <li><a class="nav-link {% if '/suppliers' in request.url.path %}active{% endif %}" href="/suppliers"><i class="bi bi-truck"></i> Suppliers</a></li>
-        <li><a class="nav-link {% if '/po' in request.url.path %}active{% endif %}" href="/po"><i class="bi bi-receipt"></i> Purchase Orders</a></li>
+        <li><a class="nav-link {% if request.url.path == '/dashboard' %}active{% endif %}" href="/dashboard"><i class="bi bi-speedometer2"></i> 儀表板</a></li>
+        <li><a class="nav-link {% if '/products' in request.url.path %}active{% endif %}" href="/products"><i class="bi bi-box-seam"></i> 商品管理</a></li>
+        <li><a class="nav-link {% if '/movements' in request.url.path %}active{% endif %}" href="/movements"><i class="bi bi-arrow-left-right"></i> 庫存異動</a></li>
+        <li><a class="nav-link {% if '/suppliers' in request.url.path %}active{% endif %}" href="/suppliers"><i class="bi bi-truck"></i> 供應商</a></li>
+        <li><a class="nav-link {% if '/po' in request.url.path %}active{% endif %}" href="/po"><i class="bi bi-receipt"></i> 採購單</a></li>
         {% if current_user and current_user.role.value == 'admin' %}
-        <li><a class="nav-link {% if '/warehouses' in request.url.path %}active{% endif %}" href="/warehouses"><i class="bi bi-building"></i> Warehouses</a></li>
+        <li><a class="nav-link {% if '/warehouses' in request.url.path %}active{% endif %}" href="/warehouses"><i class="bi bi-building"></i> 倉庫管理</a></li>
         <li class="mt-2"><hr class="border-secondary my-1"></li>
-        <li><a class="nav-link {% if '/users' in request.url.path %}active{% endif %}" href="/users"><i class="bi bi-people"></i> Users</a></li>
+        <li><a class="nav-link {% if '/users' in request.url.path %}active{% endif %}" href="/users"><i class="bi bi-people"></i> 使用者管理</a></li>
         {% endif %}
       </ul>
     </nav>

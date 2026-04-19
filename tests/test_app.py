@@ -57,7 +57,7 @@ def test_login_redirects_to_dashboard():
         login_admin(client)
         resp = client.get("/dashboard")
         assert resp.status_code == 200
-        assert "Dashboard" in resp.text
+        assert "儀表板" in resp.text
 
 
 def test_login_wrong_password_returns_401():
@@ -130,7 +130,7 @@ def test_duplicate_sku_rejected():
             },
         )
         assert resp.status_code == 400
-        assert "already exists" in resp.text.lower()
+        assert "已存在" in resp.text
 
 
 def test_edit_product():
@@ -412,8 +412,8 @@ def test_staff_sidebar_hides_admin_only_links():
 
         resp = client.get("/dashboard")
         assert resp.status_code == 200
-        assert "Warehouses" not in resp.text
-        assert "Users" not in resp.text
+        assert "倉庫管理" not in resp.text
+        assert "使用者管理" not in resp.text
 
 
 def test_staff_cannot_create_product():

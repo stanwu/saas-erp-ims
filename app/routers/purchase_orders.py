@@ -112,7 +112,7 @@ async def create_po(
             request, "purchase_orders/form.html",
             tmpl_ctx(request, current_user,
                      suppliers=suppliers, warehouses=warehouses, products=products,
-                     error="At least one line item is required."),
+                     error="至少需要一個明細項目。"),
             status_code=400,
         )
 
@@ -139,7 +139,7 @@ async def create_po(
         db.add(line)
 
     db.commit()
-    flash(request, f"Purchase order {po.po_number} created.", "success")
+    flash(request, f"採購單 {po.po_number} 已建立。", "success")
     return RedirectResponse(url=f"/po/{po.id}", status_code=303)
 
 
@@ -172,7 +172,7 @@ async def submit_po(
     if po and po.status == POStatus.draft:
         po.status = POStatus.submitted
         db.commit()
-        flash(request, f"PO {po.po_number} submitted.", "success")
+        flash(request, f"採購單 {po.po_number} 已提交。", "success")
     return RedirectResponse(url=f"/po/{po_id}", status_code=303)
 
 
@@ -218,7 +218,7 @@ async def receive_po(
             continue
         remaining = line.quantity_ordered - line.quantity_received
         if qty > remaining:
-            errors.append(f"{line.product.name}: cannot receive {qty}, remaining {remaining}")
+            errors.append(f"{line.product.name}：無法收貨 {qty}，剩餘 {remaining}")
             continue
         try:
             record_movement(
@@ -254,7 +254,7 @@ async def receive_po(
         po.received_at = datetime.now()
 
     db.commit()
-    flash(request, f"Goods received for PO {po.po_number}.", "success")
+    flash(request, f"採購單 {po.po_number} 已收貨。", "success")
     return RedirectResponse(url=f"/po/{po_id}", status_code=303)
 
 
@@ -270,5 +270,5 @@ async def cancel_po(
     if po and po.status in (POStatus.draft, POStatus.submitted):
         po.status = POStatus.cancelled
         db.commit()
-        flash(request, f"PO {po.po_number} cancelled.", "warning")
+        flash(request, f"採購單 {po.po_number} 已取消。", "warning")
     return RedirectResponse(url=f"/po/{po_id}", status_code=303)

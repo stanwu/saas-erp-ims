@@ -1,9 +1,9 @@
 {% extends "base.html" %}
-{% block title %}New Movement — Stanis IMS{% endblock %}
+{% block title %}新增庫存異動 — Stanis IMS{% endblock %}
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3">
-  <h4 class="mb-0">New Inventory Movement</h4>
-  <a href="/movements" class="btn btn-sm btn-outline-secondary">← Back</a>
+  <h4 class="mb-0">新增庫存異動</h4>
+  <a href="/movements" class="btn btn-sm btn-outline-secondary">← 返回</a>
 </div>
 
 {% if error %}
@@ -16,25 +16,25 @@
       <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
       <div class="row g-3">
         <div class="col-md-6">
-          <label class="form-label">Product <span class="text-danger">*</span></label>
+          <label class="form-label">商品 <span class="text-danger">*</span></label>
           <select name="product_id" class="form-select" required>
-            <option value="">— Select product —</option>
+            <option value="">— 選擇商品 —</option>
             {% for p in products %}
             <option value="{{ p.id }}" {% if form.get('product_id') == p.id %}selected{% endif %}>{{ p.sku }} — {{ p.name }}</option>
             {% endfor %}
           </select>
         </div>
         <div class="col-md-6">
-          <label class="form-label">Warehouse <span class="text-danger">*</span></label>
+          <label class="form-label">倉庫 <span class="text-danger">*</span></label>
           <select name="warehouse_id" class="form-select" required>
-            <option value="">— Select warehouse —</option>
+            <option value="">— 選擇倉庫 —</option>
             {% for w in warehouses %}
             <option value="{{ w.id }}" {% if form.get('warehouse_id') == w.id %}selected{% endif %}>{{ w.name }}</option>
             {% endfor %}
           </select>
         </div>
         <div class="col-md-4">
-          <label class="form-label">Type <span class="text-danger">*</span></label>
+          <label class="form-label">類型 <span class="text-danger">*</span></label>
           <select name="movement_type" class="form-select" required>
             {% for mt in movement_types %}
             <option value="{{ mt.value }}" {% if form.get('movement_type') == mt.value %}selected{% endif %}>
@@ -44,16 +44,16 @@
           </select>
         </div>
         <div class="col-md-4">
-          <label class="form-label">Quantity <span class="text-danger">*</span></label>
+          <label class="form-label">數量 <span class="text-danger">*</span></label>
           <input type="number" name="quantity" class="form-control" min="1" value="{{ form.get('quantity', '') }}" required>
         </div>
         <div class="col-12">
-          <label class="form-label">Note</label>
+          <label class="form-label">備註</label>
           <input type="text" name="note" class="form-control" value="{{ form.get('note', '') }}">
         </div>
         <div class="col-12">
-          <button type="submit" class="btn btn-primary">Record Movement</button>
-          <a href="/movements" class="btn btn-outline-secondary ms-2">Cancel</a>
+          <button type="submit" class="btn btn-primary">記錄異動</button>
+          <a href="/movements" class="btn btn-outline-secondary ms-2">取消</a>
         </div>
       </div>
     </form>
