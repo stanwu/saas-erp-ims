@@ -1,16 +1,16 @@
 {% from "partials/pagination.html" import render_pagination %}
 {% extends "base.html" %}
-{% block title %}Suppliers — Stanis IMS{% endblock %}
+{% block title %}供應商 — Stanis IMS{% endblock %}
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3">
-  <h4 class="mb-0">Suppliers <span class="badge bg-secondary fs-6">{{ total }}</span></h4>
-  <a href="/suppliers/new" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> New Supplier</a>
+  <h4 class="mb-0">供應商 <span class="badge bg-secondary fs-6">{{ total }}</span></h4>
+  <a href="/suppliers/new" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> 新增供應商</a>
 </div>
 
 <div class="card">
   <div class="table-responsive">
     <table class="table table-hover table-sm mb-0">
-      <thead class="table-light"><tr><th>Name</th><th>Contact</th><th>Email</th><th>Phone</th><th>Status</th><th></th></tr></thead>
+      <thead class="table-light"><tr><th>名稱</th><th>聯絡人</th><th>電子郵件</th><th>電話</th><th>狀態</th><th></th></tr></thead>
       <tbody>
         {% for s in suppliers %}
         <tr>
@@ -18,13 +18,13 @@
           <td class="small">{{ s.contact_person or "—" }}</td>
           <td class="small">{{ s.email or "—" }}</td>
           <td class="small">{{ s.phone or "—" }}</td>
-          <td>{% if s.is_active %}<span class="badge bg-success">Active</span>{% else %}<span class="badge bg-secondary">Inactive</span>{% endif %}</td>
+          <td>{% if s.is_active %}<span class="badge bg-success">啟用</span>{% else %}<span class="badge bg-secondary">停用</span>{% endif %}</td>
           <td class="text-end">
-            <a href="/suppliers/{{ s.id }}/edit" class="btn btn-sm btn-outline-secondary py-0 px-1">Edit</a>
+            <a href="/suppliers/{{ s.id }}/edit" class="btn btn-sm btn-outline-secondary py-0 px-1">編輯</a>
           </td>
         </tr>
         {% else %}
-        <tr><td colspan="6" class="text-center text-muted py-4">No suppliers found.</td></tr>
+        <tr><td colspan="6" class="text-center text-muted py-4">找不到供應商。</td></tr>
         {% endfor %}
       </tbody>
     </table>

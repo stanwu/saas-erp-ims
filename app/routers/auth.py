@@ -39,7 +39,7 @@ def login(
         new_csrf = generate_csrf_token(request)
         return templates.TemplateResponse(
             request, "auth/login.html",
-            {"csrf_token": new_csrf, "error": "Invalid request. Please try again."},
+            {"csrf_token": new_csrf, "error": "請求無效，請再試一次。"},
             status_code=403,
         )
 
@@ -48,13 +48,13 @@ def login(
         new_csrf = generate_csrf_token(request)
         return templates.TemplateResponse(
             request, "auth/login.html",
-            {"csrf_token": new_csrf, "error": "Invalid username or password."},
+            {"csrf_token": new_csrf, "error": "帳號或密碼錯誤。"},
             status_code=401,
         )
 
     request.session.clear()
     request.session["user_id"] = user.id
-    flash(request, f"Welcome back, {user.username}!", "success")
+    flash(request, f"歡迎回來，{user.username}！", "success")
     return RedirectResponse(url="/dashboard", status_code=303)
 
 

@@ -78,10 +78,10 @@ async def create_supplier(
         return templates.TemplateResponse(
             request,
             "suppliers/form.html",
-            tmpl_ctx(request, current_user, supplier=None, error="Supplier name already exists."),
+            tmpl_ctx(request, current_user, supplier=None, error="此供應商名稱已存在。"),
             status_code=400,
         )
-    flash(request, f"Supplier '{name}' created.", "success")
+    flash(request, f"供應商「{name}」已建立。", "success")
     return RedirectResponse(url="/suppliers", status_code=303)
 
 
@@ -130,8 +130,8 @@ async def edit_supplier(
         return templates.TemplateResponse(
             request,
             "suppliers/form.html",
-            tmpl_ctx(request, current_user, supplier=supplier, error="Supplier name already exists."),
+            tmpl_ctx(request, current_user, supplier=supplier, error="此供應商名稱已存在。"),
             status_code=400,
         )
-    flash(request, f"Supplier '{supplier.name}' updated.", "success")
+    flash(request, f"供應商「{supplier.name}」已更新。", "success")
     return RedirectResponse(url="/suppliers", status_code=303)

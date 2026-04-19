@@ -1,9 +1,9 @@
 {% extends "base.html" %}
-{% block title %}{% if product %}Edit Product{% else %}New Product{% endif %} — Stanis IMS{% endblock %}
+{% block title %}{% if product %}編輯商品{% else %}新增商品{% endif %} — Stanis IMS{% endblock %}
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3">
-  <h4 class="mb-0">{% if product %}Edit Product{% else %}New Product{% endif %}</h4>
-  <a href="/products" class="btn btn-sm btn-outline-secondary">← Back</a>
+  <h4 class="mb-0">{% if product %}編輯商品{% else %}新增商品{% endif %}</h4>
+  <a href="/products" class="btn btn-sm btn-outline-secondary">← 返回</a>
 </div>
 
 {% if error %}
@@ -22,11 +22,11 @@
         </div>
         {% endif %}
         <div class="col-md-{% if product %}6{% else %}8{% endif %}">
-          <label class="form-label">Name <span class="text-danger">*</span></label>
+          <label class="form-label">名稱 <span class="text-danger">*</span></label>
           <input type="text" name="name" class="form-control" value="{{ product.name if product else '' }}" required>
         </div>
         <div class="col-md-6">
-          <label class="form-label">Category</label>
+          <label class="form-label">分類</label>
           <select name="category_id" class="form-select">
             <option value="">— None —</option>
             {% for cat in categories %}
@@ -35,31 +35,31 @@
           </select>
         </div>
         <div class="col-md-3">
-          <label class="form-label">Unit</label>
+          <label class="form-label">單位</label>
           <input type="text" name="unit" class="form-control" value="{{ product.unit if product else 'pcs' }}" placeholder="pcs / kg / L">
         </div>
         <div class="col-md-3">
-          <label class="form-label">Cost Price</label>
+          <label class="form-label">成本價</label>
           <input type="number" name="cost_price" class="form-control" step="0.01" min="0" value="{{ product.cost_price if product else '0' }}">
         </div>
         <div class="col-md-3">
-          <label class="form-label">Reorder Point</label>
+          <label class="form-label">再訂購點</label>
           <input type="number" name="reorder_point" class="form-control" min="0" value="{{ product.reorder_point if product else '0' }}">
         </div>
         <div class="col-12">
-          <label class="form-label">Description</label>
+          <label class="form-label">描述</label>
           <textarea name="description" class="form-control" rows="2">{{ product.description if product else '' }}</textarea>
         </div>
         <div class="col-12">
           <div class="form-check">
             <input class="form-check-input" type="checkbox" name="is_active" id="is_active" value="on"
               {% if (product and product.is_active) or not product %}checked{% endif %}>
-            <label class="form-check-label" for="is_active">Active</label>
+            <label class="form-check-label" for="is_active">啟用</label>
           </div>
         </div>
         <div class="col-12">
-          <button type="submit" class="btn btn-primary">{% if product %}Save Changes{% else %}Create Product{% endif %}</button>
-          <a href="/products" class="btn btn-outline-secondary ms-2">Cancel</a>
+          <button type="submit" class="btn btn-primary">{% if product %}儲存變更{% else %}建立商品{% endif %}</button>
+          <a href="/products" class="btn btn-outline-secondary ms-2">取消</a>
         </div>
       </div>
     </form>

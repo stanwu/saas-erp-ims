@@ -119,5 +119,5 @@ async def create_movement(
             status_code=400,
         )
 
-    flash(request, "Movement recorded.", "success")
+    flash(request, "庫存異動已記錄。", "success")
     return RedirectResponse(url="/movements", status_code=303)

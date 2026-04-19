@@ -74,10 +74,10 @@ async def create_warehouse(
         return templates.TemplateResponse(
             request,
             "warehouses/form.html",
-            tmpl_ctx(request, current_user, warehouse=None, error="Warehouse name already exists."),
+            tmpl_ctx(request, current_user, warehouse=None, error="此倉庫名稱已存在。"),
             status_code=400,
         )
-    flash(request, f"Warehouse '{name}' created.", "success")
+    flash(request, f"倉庫「{name}」已建立。", "success")
     return RedirectResponse(url="/warehouses", status_code=303)
 
 
@@ -122,8 +122,8 @@ async def edit_warehouse(
         return templates.TemplateResponse(
             request,
             "warehouses/form.html",
-            tmpl_ctx(request, current_user, warehouse=warehouse, error="Warehouse name already exists."),
+            tmpl_ctx(request, current_user, warehouse=warehouse, error="此倉庫名稱已存在。"),
             status_code=400,
         )
-    flash(request, f"Warehouse '{warehouse.name}' updated.", "success")
+    flash(request, f"倉庫「{warehouse.name}」已更新。", "success")
     return RedirectResponse(url="/warehouses", status_code=303)

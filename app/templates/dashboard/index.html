@@ -1,7 +1,7 @@
 {% extends "base.html" %}
-{% block title %}Dashboard — Stanis IMS{% endblock %}
+{% block title %}儀表板 — Stanis IMS{% endblock %}
 {% block content %}
-<h4 class="mb-4">Dashboard</h4>
+<h4 class="mb-4">儀表板</h4>
 
 <div class="row g-3 mb-4">
   <div class="col-sm-6 col-lg-3">
@@ -10,7 +10,7 @@
         <div class="d-flex justify-content-between align-items-center">
           <div>
             <div class="fs-2 fw-bold">{{ product_count }}</div>
-            <div class="small">Active Products</div>
+            <div class="small">商品數量</div>
           </div>
           <i class="bi bi-box-seam fs-1 opacity-50"></i>
         </div>
@@ -23,7 +23,7 @@
         <div class="d-flex justify-content-between align-items-center">
           <div>
             <div class="fs-2 fw-bold">{{ open_po_count }}</div>
-            <div class="small">Open Purchase Orders</div>
+            <div class="small">未結採購單</div>
           </div>
           <i class="bi bi-receipt fs-1 opacity-50"></i>
         </div>
@@ -36,7 +36,7 @@
         <div class="d-flex justify-content-between align-items-center">
           <div>
             <div class="fs-2 fw-bold">{{ low_stock|length }}</div>
-            <div class="small">Low Stock Alerts</div>
+            <div class="small">低庫存警告</div>
           </div>
           <i class="bi bi-exclamation-triangle fs-1 opacity-50"></i>
         </div>
@@ -49,7 +49,7 @@
         <div class="d-flex justify-content-between align-items-center">
           <div>
             <div class="fs-2 fw-bold">{{ total_movements }}</div>
-            <div class="small">Total Movements</div>
+            <div class="small">異動總計</div>
           </div>
           <i class="bi bi-arrow-left-right fs-1 opacity-50"></i>
         </div>
@@ -60,10 +60,10 @@
 
 {% if low_stock %}
 <div class="card mb-4 border-danger">
-  <div class="card-header bg-danger text-white"><i class="bi bi-exclamation-triangle"></i> Low Stock Alerts</div>
+  <div class="card-header bg-danger text-white"><i class="bi bi-exclamation-triangle"></i> 低庫存警告</div>
   <div class="table-responsive">
     <table class="table table-sm mb-0">
-      <thead class="table-light"><tr><th>SKU</th><th>Product</th><th>Warehouse</th><th>Current Stock</th><th>Reorder Point</th></tr></thead>
+      <thead class="table-light"><tr><th>SKU</th><th>商品</th><th>倉庫</th><th>目前庫存</th><th>再訂購點</th></tr></thead>
       <tbody>
         {% for product, stock in low_stock %}
         <tr>
@@ -82,12 +82,12 @@
 
 <div class="card">
   <div class="card-header d-flex justify-content-between align-items-center">
-    <span><i class="bi bi-clock-history"></i> Recent Movements</span>
-    <a href="/movements" class="btn btn-sm btn-outline-secondary">View All</a>
+    <span><i class="bi bi-clock-history"></i> 最近庫存異動</span>
+    <a href="/movements" class="btn btn-sm btn-outline-secondary">查看全部</a>
   </div>
   <div class="table-responsive">
     <table class="table table-sm mb-0">
-      <thead class="table-light"><tr><th>Time</th><th>Product</th><th>Warehouse</th><th>Type</th><th>Qty</th><th>By</th></tr></thead>
+      <thead class="table-light"><tr><th>時間</th><th>商品</th><th>倉庫</th><th>類型</th><th>數量</th><th>操作人</th></tr></thead>
       <tbody>
         {% for m in recent_movements %}
         <tr>
@@ -102,7 +102,7 @@
           <td class="small">{{ m.user.username if m.user else "—" }}</td>
         </tr>
         {% else %}
-        <tr><td colspan="6" class="text-center text-muted py-3">No movements yet.</td></tr>
+        <tr><td colspan="6" class="text-center text-muted py-3">尚無異動紀錄。</td></tr>
         {% endfor %}
       </tbody>
     </table>

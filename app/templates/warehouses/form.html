@@ -1,9 +1,9 @@
 {% extends "base.html" %}
-{% block title %}{% if warehouse %}Edit Warehouse{% else %}New Warehouse{% endif %} — Stanis IMS{% endblock %}
+{% block title %}{% if warehouse %}編輯倉庫{% else %}新增倉庫{% endif %} — Stanis IMS{% endblock %}
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3">
-  <h4 class="mb-0">{% if warehouse %}Edit Warehouse{% else %}New Warehouse{% endif %}</h4>
-  <a href="/warehouses" class="btn btn-sm btn-outline-secondary">← Back</a>
+  <h4 class="mb-0">{% if warehouse %}編輯倉庫{% else %}新增倉庫{% endif %}</h4>
+  <a href="/warehouses" class="btn btn-sm btn-outline-secondary">← 返回</a>
 </div>
 
 {% if error %}
@@ -16,23 +16,23 @@
       <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
       <div class="row g-3">
         <div class="col-md-6">
-          <label class="form-label">Name <span class="text-danger">*</span></label>
+          <label class="form-label">名稱 <span class="text-danger">*</span></label>
           <input type="text" name="name" class="form-control" value="{{ warehouse.name if warehouse else '' }}" required>
         </div>
         <div class="col-md-6">
-          <label class="form-label">Location</label>
+          <label class="form-label">位置</label>
           <input type="text" name="location" class="form-control" value="{{ warehouse.location if warehouse else '' }}">
         </div>
         <div class="col-12">
           <div class="form-check">
             <input class="form-check-input" type="checkbox" name="is_active" id="is_active" value="on"
               {% if (warehouse and warehouse.is_active) or not warehouse %}checked{% endif %}>
-            <label class="form-check-label" for="is_active">Active</label>
+            <label class="form-check-label" for="is_active">啟用</label>
           </div>
         </div>
         <div class="col-12">
-          <button type="submit" class="btn btn-primary">{% if warehouse %}Save Changes{% else %}Create Warehouse{% endif %}</button>
-          <a href="/warehouses" class="btn btn-outline-secondary ms-2">Cancel</a>
+          <button type="submit" class="btn btn-primary">{% if warehouse %}儲存變更{% else %}建立倉庫{% endif %}</button>
+          <a href="/warehouses" class="btn btn-outline-secondary ms-2">取消</a>
         </div>
       </div>
     </form>

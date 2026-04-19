@@ -102,10 +102,10 @@ async def create_product(
         return templates.TemplateResponse(
             request,
             "products/form.html",
-            tmpl_ctx(request, current_user, product=None, categories=categories, error="SKU already exists."),
+            tmpl_ctx(request, current_user, product=None, categories=categories, error="此 SKU 已存在。"),
             status_code=400,
         )
-    flash(request, f"Product '{name}' created.", "success")
+    flash(request, f"商品「{name}」已建立。", "success")
     return RedirectResponse(url="/products", status_code=303)
 
 
@@ -197,7 +197,7 @@ async def edit_product(
     product.reorder_point = reorder_point
     product.is_active = bool(is_active)
     db.commit()
-    flash(request, f"Product '{product.name}' updated.", "success")
+    flash(request, f"商品「{product.name}」已更新。", "success")
     return RedirectResponse(url=f"/products/{product_id}", status_code=303)
 
 
@@ -213,6 +213,6 @@ async def deactivate_product(
     if product:
         product.is_active = not product.is_active
         db.commit()
-        status = "activated" if product.is_active else "deactivated"
-        flash(request, f"Product '{product.name}' {status}.", "success")
+        status = "已啟用" if product.is_active else "已停用"
+        flash(request, f"商品「{product.name}」{status}。", "success")
     return RedirectResponse(url="/products", status_code=303)

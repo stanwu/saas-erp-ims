@@ -68,7 +68,7 @@ async def create_user(
             request,
             "users/form.html",
             tmpl_ctx(request, current_user, user=None, roles=list(UserRole),
-                     error="Password must be at least 8 characters."),
+                     error="密碼至少需要 8 個字元。"),
             status_code=400,
         )
     user = User(
@@ -86,10 +86,10 @@ async def create_user(
             request,
             "users/form.html",
             tmpl_ctx(request, current_user, user=None, roles=list(UserRole),
-                     error="Username already exists."),
+                     error="此帳號已存在。"),
             status_code=400,
         )
-    flash(request, f"User '{username}' created.", "success")
+    flash(request, f"使用者「{username}」已建立。", "success")
     return RedirectResponse(url="/users", status_code=303)
 
 
@@ -132,12 +132,12 @@ async def edit_user(
                 request,
                 "users/form.html",
                 tmpl_ctx(request, current_user, user=user, roles=list(UserRole),
-                         error="Password must be at least 8 characters."),
+                         error="密碼至少需要 8 個字元。"),
                 status_code=400,
             )
         user.password_hash = hash_password(new_password)
     db.commit()
-    flash(request, f"User '{user.username}' updated.", "success")
+    flash(request, f"使用者「{user.username}」已更新。", "success")
     return RedirectResponse(url="/users", status_code=303)
 
 
@@ -153,6 +153,6 @@ async def toggle_user(
     if user and user.id != current_user.id:
         user.is_active = not user.is_active
         db.commit()
-        status = "activated" if user.is_active else "deactivated"
-        flash(request, f"User '{user.username}' {status}.", "success")
+        status = "已啟用" if user.is_active else "已停用"
+        flash(request, f"使用者「{user.username}」{status}。", "success")
     return RedirectResponse(url="/users", status_code=303)
